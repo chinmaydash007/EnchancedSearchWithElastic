@@ -5,16 +5,22 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import com.example.classifierapp.Adapter.ViewPagerAdapter
+import com.example.classifierapp.Fragments.PostFragment
+import com.example.classifierapp.Fragments.SearchFragment
+import com.example.classifierapp.Fragments.WatchListFragment
 import com.example.classifierapp.R
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var firebaseAuthStateListener: FirebaseAuth.AuthStateListener
-
+    private lateinit var viewPagerAdapter: ViewPagerAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(toolbar)
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseAuthStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser == null) {
@@ -25,6 +31,14 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
+        viewPagerAdapter = ViewPagerAdapter(supportFragmentManager, 0);
+
+        viewPagerAdapter.addFragment(PostFragment(), "Post")
+        viewPagerAdapter.addFragment(SearchFragment(), "Search")
+        viewPagerAdapter.addFragment(WatchListFragment(), "WatchList")
+
+        tabs.setupWithViewPager(viewpager, true)
+        viewpager.adapter = viewPagerAdapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
