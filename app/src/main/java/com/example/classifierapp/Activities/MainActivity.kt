@@ -1,10 +1,13 @@
 package com.example.classifierapp.Activities
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.classifierapp.Adapter.ViewPagerAdapter
 import com.example.classifierapp.Fragments.PostFragment
 import com.example.classifierapp.Fragments.SearchFragment
@@ -13,10 +16,15 @@ import com.example.classifierapp.R
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
 
+
+import com.example.classifierapp.Extensions.logMessage
+import java.util.*
+
 class MainActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var firebaseAuthStateListener: FirebaseAuth.AuthStateListener
     private lateinit var viewPagerAdapter: ViewPagerAdapter
+    var PERMISSION_REQUEST_CODE=10
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -31,6 +39,10 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
+        verifyPermission()
+    }
+
+    fun initViewpager() {
         viewPagerAdapter = ViewPagerAdapter(supportFragmentManager, 0);
 
         viewPagerAdapter.addFragment(PostFragment(), "Post")
@@ -74,4 +86,36 @@ class MainActivity : AppCompatActivity() {
         FirebaseAuth.getInstance().removeAuthStateListener(firebaseAuthStateListener)
     }
 
+    fun verifyPermission() {
+        var permission = arrayOf(
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.CAMERA
+        )
+        if (ContextCompat.checkSelfPermission(
+                this,
+                permission[0]
+            ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                this,
+                permission[1]
+            ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                this,
+                permission[2]
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            initViewpager()
+
+        } else {
+            ActivityCompat.requestPermissions(this, permission, PERMISSION_REQUEST_CODE)
+        }
+
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        verifyPermission()
+    }
 }
