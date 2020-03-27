@@ -4,7 +4,7 @@ package com.example.classifierapp.Dialog
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
+
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -12,11 +12,11 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+
 import androidx.fragment.app.DialogFragment
 import com.example.classifierapp.R
-import kotlinx.android.synthetic.main.select_photo_dialog.*
+
+import kotlinx.android.synthetic.main.select_photo_dialog.view.*
 import java.util.jar.Manifest
 
 class SelectPhotoDialog : DialogFragment() {
@@ -29,14 +29,16 @@ class SelectPhotoDialog : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         var view = inflater.inflate(R.layout.select_photo_dialog, container, false)
-        dialogChoosePhoto.setOnClickListener {
+        view.dialogChoosePhoto.setOnClickListener {
             var intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.setType("image/*")
             startActivityForResult(intent, PICK_IMAGE_REQUEST_CODE)
+
         }
-        dialogOpenCamera.setOnClickListener {
+        view.dialogOpenCamera.setOnClickListener {
             var intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             startActivityForResult(intent, CAMERA_REQUET_CODE)
+
 
         }
 
@@ -48,23 +50,26 @@ class SelectPhotoDialog : DialogFragment() {
             var selectedImageUri = data?.data
             if (selectedImageUri != null) {
                 onPhotoSelectedListerner.getImagePath(selectedImageUri)
+                dialog?.dismiss()
             }
 
         } else if (requestCode == CAMERA_REQUET_CODE && resultCode == Activity.RESULT_OK) {
             var bitmap: Bitmap = data?.extras?.get("data") as Bitmap
             onPhotoSelectedListerner.getImageBitmap(bitmap)
+            dialog?.dismiss()
+
 
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        onPhotoSelectedListerner = targetFragment as OnPhotoSelectedListerner
     }
 
     interface OnPhotoSelectedListerner {
         fun getImagePath(uri: Uri)
         fun getImageBitmap(bitmap: Bitmap)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        onPhotoSelectedListerner = activity as OnPhotoSelectedListerner
     }
 
 
