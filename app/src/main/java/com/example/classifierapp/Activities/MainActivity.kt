@@ -75,7 +75,6 @@ class MainActivity : AppCompatActivity() {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
             finish()
-
         }
         FirebaseAuth.getInstance().addAuthStateListener(firebaseAuthStateListener)
 
